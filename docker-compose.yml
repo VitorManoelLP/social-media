@@ -1,0 +1,73 @@
+version: "3.9"
+
+x-default_spring_definition: &default_spring_definition
+  image: gradle:7.2.0-jdk17
+  command: ./gradlew bootRun
+  networks:
+    - loadbalance_network
+  working_dir: /app
+
+services: 
+  postgres: 
+    image: postgres
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    volumes:
+      - ${POSTGRES_PATH}:/var/lib/postgresql/data
+      - ./init-schema.sql:/docker-entrypoint-initdb.d/init-schema.sql
+    ports: 
+      - 5432:5432
+    networks:
+      - loadbalance_network
+  keycloak: 
+    image: quay.io/keycloak/keycloak:20.0.0
+    command: start-dev
+    environment:
+      KC_DB: postgres
+      KC_DB_URL_HOST: postgres
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_PASSWORD: keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_SCHEMA: keycloak
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
+    networks:
+      - loadbalance_network
+  keycloak_gateway:
+    <<: *default_spring_definition
+    container_name: keycloak_gateway
+    volumes: 
+      - ./auth:/app
+    environment:
+      EUREKA_ADDRESS: http://eureka:8761
+      KEYCLOAK_ADDRESS: http://keycloak:8080
+      KEYCLOAK_REALM_NAME: SOCIAL_MEDIA
+      KEYCLOAK_CLIENT_NAME: 'SOCIAL_MEDIA_CLIENT'
+      KEYCLOAK_SECRET: sP1u8IVqRttgTYFYiYqv6WphtgHAetTv
+    ports: 
+      - 9000:9000
+    depends_on:
+      keycloak:
+        condition: service_started
+      eureka:
+        condition: service_started
+  eureka:
+    <<: *default_spring_definition
+    container_name: eureka
+    volumes: 
+      - ./eureka:/app
+    environment:
+      EUREKA_ADDRESS: http://localhost:8761
+    ports: 
+      - 8761:8761
+      
+
+networks:
+  loadbalance_network:
+    driver: bridge
