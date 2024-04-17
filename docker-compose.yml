@@ -23,7 +23,7 @@ services:
       - loadbalance_network
   keycloak: 
     image: quay.io/keycloak/keycloak:20.0.0
-    command: start-dev
+    command: ["-Dkeycloak.import=/config/realm-config.json", "start-dev"]
     environment:
       KC_DB: postgres
       KC_DB_URL_HOST: postgres
@@ -35,6 +35,8 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: admin
     ports:
       - 8080:8080
+    volumes:
+      - ./keycloak-init.json:/config/realm-config.json
     depends_on:
       - postgres
     networks:

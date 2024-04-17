@@ -1,0 +1,17 @@
+{
+  "realm": "SOCIAL_MEDIA",
+  "enabled": true,
+  "displayName": "Social Media",
+  "clients": [
+    {
+      "clientId": "SOCIAL_MEDIA_CLIENT",
+      "enabled": true,
+      "publicClient": true,
+      "secret": "sP1u8IVqRttgTYFYiYqv6WphtgHAetTv",
+      "redirectUris": [
+        "/realms/SOCIAL_MEDIA/account/*"
+      ]
+    }
+  ]
+}
+
