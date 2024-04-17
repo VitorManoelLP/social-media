@@ -28,7 +28,7 @@ public class KeycloakProperties {
     private record KeycloakEndpoints(String token, String validateToken) {
     }
 
-    public KeycloakProperties(ObjectMapper objectMapper) {
+    public KeycloakProperties() {
         keycloakEndpoints = new KeycloakEndpoints("/protocol/openid-connect/token", "/protocol/openid-connect/certs");
     }
 

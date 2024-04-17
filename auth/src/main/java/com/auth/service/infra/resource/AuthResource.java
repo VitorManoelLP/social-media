@@ -1,7 +1,7 @@
 package com.auth.service.infra.resource;
 
 import com.auth.service.application.AuthenticationManager;
-import com.auth.service.domain.User;
+import com.auth.service.domain.UserLogin;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,7 @@ public class AuthResource {
     private final AuthenticationManager authenticationManager;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid User user) {
+    public ResponseEntity<?> login(@RequestBody @Valid UserLogin user) {
         return authenticationManager.login(user);
     }
 

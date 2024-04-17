@@ -1,7 +1,7 @@
 package com.auth.service.infra;
 
 import com.auth.service.application.AuthenticationManager;
-import com.auth.service.domain.User;
+import com.auth.service.domain.UserLogin;
 import com.auth.service.infra.property.KeycloakHeadersBuilder;
 import com.auth.service.infra.property.KeycloakProperties;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ public class AuthenticationKeycloakManager implements AuthenticationManager {
     private final RestTemplate restTemplate;
 
     @Override
-    public ResponseEntity<?> login(User user) {
+    public ResponseEntity<?> login(UserLogin user) {
 
         final HttpEntity<MultiValueMap<String, String>> keycloakEntity = KeycloakHeadersBuilder.builder(keycloakProperties)
                 .withUsername(user.username())
