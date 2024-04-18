@@ -53,6 +53,9 @@ services:
       KEYCLOAK_REALM_NAME: SOCIAL_MEDIA
       KEYCLOAK_CLIENT_NAME: 'SOCIAL_MEDIA_CLIENT'
       KEYCLOAK_SECRET: sP1u8IVqRttgTYFYiYqv6WphtgHAetTv
+      POSTGRES_ADDRESS: postgres:5432
+      KEYCLOAK_ADMIN_ID: admin-cli
+      KEYCLOAK_ADMIN_SECRET: b6JlMKbOLvhpWo99tlPxbpCGQtmRO7XX
     ports: 
       - 9000:9000
     depends_on:
