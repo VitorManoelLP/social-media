@@ -2,13 +2,14 @@ import { Injectable } from "@angular/core";
 import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree } from "@angular/router";
 import { KeycloakAuthGuard } from "keycloak-angular";
 import { KeycloakWrapperService } from "./shared/keycloak.wrapper.service";
+import { UserService } from "../shared/user.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthGuard extends KeycloakAuthGuard {
 
-  constructor(protected override readonly router: Router, protected readonly keycloak: KeycloakWrapperService) {
+  constructor(protected override readonly router: Router, protected readonly keycloak: KeycloakWrapperService, private userService: UserService) {
     super(router, keycloak);
   }
 
@@ -19,6 +20,8 @@ export class AuthGuard extends KeycloakAuthGuard {
         redirectUri: window.location.origin
       });
     }
+
+    this.userService.loggedUser = await this.keycloak.loadUserProfile();
 
     return this.authenticated;
   }
