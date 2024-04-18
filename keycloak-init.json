@@ -6,11 +6,20 @@
     {
       "clientId": "SOCIAL_MEDIA_CLIENT",
       "enabled": true,
-      "publicClient": true,
+      "publicClient": false,
       "secret": "sP1u8IVqRttgTYFYiYqv6WphtgHAetTv",
       "redirectUris": [
         "/realms/SOCIAL_MEDIA/account/*"
-      ]
+      ],
+      "baseUrl": "/realms/SOCIAL_MEDIA/account"
+    },
+    {
+      "clientId": "social_media_frontend",
+      "enabled": true,
+      "publicClient": true,
+      "baseUrl": "http://localhost:4200/",
+      "webOrigins": ["*"],
+      "redirectUris": ["*"]
     }
   ]
 }
