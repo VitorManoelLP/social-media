@@ -1,6 +1,23 @@
 spring:
+  flyway:
+    schemas: auth
   application:
     name: keycloak-gateway
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_ADDRESS}/postgres
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+      show-sql: true
+      default_schema: auth
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
   cloud:
     gateway:
       discovery:

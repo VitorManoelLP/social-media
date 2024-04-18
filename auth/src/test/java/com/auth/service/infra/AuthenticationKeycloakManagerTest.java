@@ -6,6 +6,7 @@ import com.auth.service.domain.UserSignUp;
 import com.auth.service.fixture.ClientContextHolderFixture;
 import com.auth.service.fixture.KeycloakPropertiesFixture;
 import com.auth.service.fixture.UserFixture;
+import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.AfterAll;
@@ -35,6 +36,9 @@ public class AuthenticationKeycloakManagerTest {
     @Mock
     private RestTemplate restTemplate;
 
+    @Mock
+    private EntityManager entityManager;
+
     @Captor
     private ArgumentCaptor<HttpEntity<MultiValueMap<String, String>>> captor;
 
@@ -48,7 +52,7 @@ public class AuthenticationKeycloakManagerTest {
 
     @BeforeEach
     public void setup() {
-        authenticationKeycloakManager = new AuthenticationKeycloakManager(restTemplate);
+        authenticationKeycloakManager = new AuthenticationKeycloakManager(restTemplate, entityManager);
     }
 
     @AfterAll
@@ -159,6 +163,15 @@ public class AuthenticationKeycloakManagerTest {
                                 false)
                 );
 
+    }
+
+    @Test
+    public void shouldCreateUserOnDatabaseWhenKeycloakReturns200() {
+        when(restTemplate.postForEntity(eq("localhost:8080/admin/realms/realm/users"), any(HttpEntity.class), eq(Void.class))).thenReturn(ResponseEntity.ok().build());
+        final UserSignUp userSignUp = UserFixture.createUserSignUp();
+        final ResponseEntity<?> response = authenticationKeycloakManager.create(userSignUp);
+        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        verify(entityManager, atLeastOnce()).persist(any());
     }
 
     @Test

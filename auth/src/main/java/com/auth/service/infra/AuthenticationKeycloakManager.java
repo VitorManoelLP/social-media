@@ -1,13 +1,12 @@
 package com.auth.service.infra;
 
 import com.auth.service.application.AuthenticationManager;
-import com.auth.service.domain.KeycloakClient;
-import com.auth.service.domain.UserLogin;
-import com.auth.service.domain.UserRepresentation;
-import com.auth.service.domain.UserSignUp;
+import com.auth.service.domain.*;
 import com.auth.service.infra.context.ClientContextHolder;
 import com.auth.service.infra.property.KeycloakHeadersBuilder;
 import com.auth.service.infra.property.KeycloakProperties;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +18,12 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Optional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AuthenticationKeycloakManager implements AuthenticationManager {
 
     private final RestTemplate restTemplate;
+    private final EntityManager entityManager;
 
     @Override
     public ResponseEntity<?> login(UserLogin user) {
@@ -85,11 +86,18 @@ public class AuthenticationKeycloakManager implements AuthenticationManager {
 
         try {
 
-            return restTemplate.postForEntity(
+            final ResponseEntity<Void> response = restTemplate.postForEntity(
                     keycloakProperties.getCreateUserEndpoint(),
                     keycloakEntity,
                     Void.class
             );
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                final User user = new User(userSignUp.email(), userSignUp.username());
+                entityManager.persist(user);
+            }
+
+            return response;
 
         } catch (HttpClientErrorException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getMessage());
