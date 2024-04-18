@@ -20,7 +20,7 @@ spring:
             client-secret: ${KEYCLOAK_SECRET}
             authorization-grant-type: authorization_code
             scope: openid
-            auth-uri: ${KEYCLOAK_ADDRESS}/realms/${KEYCLOAK_REALM_NAME}
+            auth-uri: ${KEYCLOAK_ADDRESS}
             realm: ${KEYCLOAK_REALM_NAME}
 
 server:

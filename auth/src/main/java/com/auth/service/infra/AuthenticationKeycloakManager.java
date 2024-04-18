@@ -1,7 +1,11 @@
 package com.auth.service.infra;
 
 import com.auth.service.application.AuthenticationManager;
+import com.auth.service.domain.KeycloakClient;
 import com.auth.service.domain.UserLogin;
+import com.auth.service.domain.UserRepresentation;
+import com.auth.service.domain.UserSignUp;
+import com.auth.service.infra.context.ClientContextHolder;
 import com.auth.service.infra.property.KeycloakHeadersBuilder;
 import com.auth.service.infra.property.KeycloakProperties;
 import lombok.RequiredArgsConstructor;
@@ -12,15 +16,19 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class AuthenticationKeycloakManager implements AuthenticationManager {
 
-    private final KeycloakProperties keycloakProperties;
     private final RestTemplate restTemplate;
 
     @Override
     public ResponseEntity<?> login(UserLogin user) {
+
+        final KeycloakClient client = ClientContextHolder.getInstance().getClient();
+        final KeycloakProperties keycloakProperties = client.keycloakProperties();
 
         final HttpEntity<MultiValueMap<String, String>> keycloakEntity = KeycloakHeadersBuilder.builder(keycloakProperties)
                 .withUsername(user.username())
@@ -45,6 +53,9 @@ public class AuthenticationKeycloakManager implements AuthenticationManager {
     @Override
     public ResponseEntity<?> refresh(String refreshToken) {
 
+        final KeycloakClient client = ClientContextHolder.getInstance().getClient();
+        final KeycloakProperties keycloakProperties = client.keycloakProperties();
+
         final HttpEntity<MultiValueMap<String, String>> keycloakEntity = KeycloakHeadersBuilder.builder(keycloakProperties)
                 .withGrantType("refresh_token")
                 .withRefreshToken(refreshToken)
@@ -61,6 +72,29 @@ public class AuthenticationKeycloakManager implements AuthenticationManager {
         } catch (HttpClientErrorException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getMessage());
         }
+    }
+
+    @Override
+    public ResponseEntity<?> create(UserSignUp userSignUp) {
+
+        final KeycloakClient client = ClientContextHolder.getInstance().getClient();
+        final KeycloakProperties keycloakProperties = client.keycloakProperties();
+
+        final HttpEntity<UserRepresentation> keycloakEntity = KeycloakHeadersBuilder.builder(UserRepresentation.of(userSignUp))
+                .build(client.jwt().getToken());
+
+        try {
+
+            return restTemplate.postForEntity(
+                    keycloakProperties.getCreateUserEndpoint(),
+                    keycloakEntity,
+                    Void.class
+            );
+
+        } catch (HttpClientErrorException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getMessage());
+        }
+
     }
 
 }

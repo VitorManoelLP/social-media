@@ -1,6 +1,5 @@
 package com.auth.service.infra.property;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -12,24 +11,50 @@ public class KeycloakProperties {
 
     private String clientId;
     private String clientSecret;
+    private String realm;
     private String scope;
     private String authUri;
-    private String realm;
     private KeycloakEndpoints keycloakEndpoints;
 
     public String getTokenEndpoint() {
-        return String.format("%s%s", authUri, keycloakEndpoints.token());
+        return getTokenEndpoint(realm);
     }
 
     public String getValidateTokenEndpoint() {
-        return String.format("%s%s", authUri, keycloakEndpoints.validateToken());
+        return getValidateTokenEndpoint(realm);
     }
 
-    private record KeycloakEndpoints(String token, String validateToken) {
+    public String getTokenEndpoint(String realm) {
+        return String.format("%s%s", getRealmUri(realm), keycloakEndpoints.token());
+    }
+
+    public String getValidateTokenEndpoint(String realm) {
+        return String.format("%s%s", getRealmUri(realm), keycloakEndpoints.validateToken());
+    }
+
+    public String getCreateUserEndpoint() {
+        return String.format("%s%s", getAdminUri(), "/users");
+    }
+
+    private String getAdminUri() {
+        return authUri + String.format(keycloakEndpoints.adminRealm(), realm);
+    }
+
+    public String getRealmUri(String realm) {
+        return authUri + String.format(keycloakEndpoints.realmUri(), realm);
+    }
+
+
+    private record KeycloakEndpoints(String adminRealm, String realmUri, String token, String validateToken) {
     }
 
     public KeycloakProperties() {
-        keycloakEndpoints = new KeycloakEndpoints("/protocol/openid-connect/token", "/protocol/openid-connect/certs");
+        keycloakEndpoints = new KeycloakEndpoints(
+                "/admin/realms/%s",
+                "/realms/%s",
+                "/protocol/openid-connect/token",
+                "/protocol/openid-connect/certs"
+        );
     }
 
 }

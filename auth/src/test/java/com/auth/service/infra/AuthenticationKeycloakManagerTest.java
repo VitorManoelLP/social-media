@@ -1,8 +1,15 @@
 package com.auth.service.infra;
 
 import com.auth.service.domain.UserLogin;
+import com.auth.service.domain.UserRepresentation;
+import com.auth.service.domain.UserSignUp;
+import com.auth.service.fixture.ClientContextHolderFixture;
 import com.auth.service.fixture.KeycloakPropertiesFixture;
+import com.auth.service.fixture.UserFixture;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.groups.Tuple;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,19 +38,32 @@ public class AuthenticationKeycloakManagerTest {
     @Captor
     private ArgumentCaptor<HttpEntity<MultiValueMap<String, String>>> captor;
 
+    @Captor
+    private ArgumentCaptor<HttpEntity<UserRepresentation>> captorUser;
+
+    @BeforeAll
+    public static void init() {
+        ClientContextHolderFixture.mockContextHolder();
+    }
+
     @BeforeEach
     public void setup() {
-        authenticationKeycloakManager = new AuthenticationKeycloakManager(KeycloakPropertiesFixture.createKeycloakProperties(), restTemplate);
+        authenticationKeycloakManager = new AuthenticationKeycloakManager(restTemplate);
+    }
+
+    @AfterAll
+    public static void afterAll() {
+        ClientContextHolderFixture.clearContextHolder();
     }
 
     @Test
     public void shouldLoginWithRightHeaders() {
 
-        when(restTemplate.postForEntity(eq("localhost:8080/protocol/openid-connect/token"), any(), eq(String.class))).thenReturn(ResponseEntity.ok("token"));
+        when(restTemplate.postForEntity(eq("localhost:8080/realms/realm/protocol/openid-connect/token"), any(), eq(String.class))).thenReturn(ResponseEntity.ok("token"));
 
         final ResponseEntity<?> response = authenticationKeycloakManager.login(new UserLogin("username", "password"));
 
-        verify(restTemplate, atLeastOnce()).postForEntity(eq("localhost:8080/protocol/openid-connect/token"), captor.capture(), eq(String.class));
+        verify(restTemplate, atLeastOnce()).postForEntity(eq("localhost:8080/realms/realm/protocol/openid-connect/token"), captor.capture(), eq(String.class));
 
         final HttpEntity<MultiValueMap<String, String>> entity = captor.getValue();
 
@@ -62,7 +82,7 @@ public class AuthenticationKeycloakManagerTest {
 
     @Test
     public void shouldReturnResponseWithExceptionWhenRestTemplateDoThrow() {
-        when(restTemplate.postForEntity(eq("localhost:8080/protocol/openid-connect/token"), any(), eq(String.class))).thenThrow(new HttpClientErrorException(HttpStatus.FORBIDDEN, "Forbidden"));
+        when(restTemplate.postForEntity(eq("localhost:8080/realms/realm/protocol/openid-connect/token"), any(), eq(String.class))).thenThrow(new HttpClientErrorException(HttpStatus.FORBIDDEN, "Forbidden"));
         final ResponseEntity<?> response = authenticationKeycloakManager.login(new UserLogin("username", "password"));
         Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
         Assertions.assertThat(response.getBody()).isEqualTo("403 Forbidden");
@@ -71,11 +91,11 @@ public class AuthenticationKeycloakManagerTest {
     @Test
     public void shouldRefreshTokenWithRightHeaders() {
 
-        when(restTemplate.postForEntity(eq("localhost:8080/protocol/openid-connect/token"), any(), eq(String.class))).thenReturn(ResponseEntity.ok("token"));
+        when(restTemplate.postForEntity(eq("localhost:8080/realms/realm/protocol/openid-connect/token"), any(), eq(String.class))).thenReturn(ResponseEntity.ok("token"));
 
         final ResponseEntity<?> response = authenticationKeycloakManager.refresh("token");
 
-        verify(restTemplate, atLeastOnce()).postForEntity(eq("localhost:8080/protocol/openid-connect/token"), captor.capture(), eq(String.class));
+        verify(restTemplate, atLeastOnce()).postForEntity(eq("localhost:8080/realms/realm/protocol/openid-connect/token"), captor.capture(), eq(String.class));
 
         final HttpEntity<MultiValueMap<String, String>> entity = captor.getValue();
 
@@ -94,10 +114,58 @@ public class AuthenticationKeycloakManagerTest {
 
     @Test
     public void shouldReturnResponseWithExceptionWhenRestTemplateDoThrowOnRefreshToken() {
-        when(restTemplate.postForEntity(eq("localhost:8080/protocol/openid-connect/token"), any(), eq(String.class))).thenThrow(new HttpClientErrorException(HttpStatus.FORBIDDEN, "Forbidden"));
+        when(restTemplate.postForEntity(eq("localhost:8080/realms/realm/protocol/openid-connect/token"), any(), eq(String.class))).thenThrow(new HttpClientErrorException(HttpStatus.FORBIDDEN, "Forbidden"));
         final ResponseEntity<?> response = authenticationKeycloakManager.refresh("refresh_token");
         Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
         Assertions.assertThat(response.getBody()).isEqualTo("403 Forbidden");
     }
 
+    @Test
+    public void shouldCreateUserWithRightPayload() {
+
+        when(restTemplate.postForEntity(eq("localhost:8080/admin/realms/realm/users"), any(HttpEntity.class), eq(Void.class))).thenReturn(ResponseEntity.ok().build());
+
+        final UserSignUp userSignUp = UserFixture.createUserSignUp();
+
+        final ResponseEntity<?> response = authenticationKeycloakManager.create(userSignUp);
+
+        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        verify(restTemplate, atLeastOnce()).postForEntity(eq("localhost:8080/admin/realms/realm/users"), captorUser.capture(), eq(Void.class));
+
+        final HttpEntity<UserRepresentation> value = captorUser.getValue();
+
+        final UserRepresentation body = value.getBody();
+
+        HttpHeaders headers = value.getHeaders();
+
+        Assertions.assertThat(headers).isNotNull();
+        Assertions.assertThat(headers.get("Authorization")).isNotNull().isEqualTo(List.of("Bearer token"));
+
+        Assertions.assertThat(body).isNotNull();
+        Assertions.assertThat(body.getEmail()).isEqualTo(userSignUp.email());
+        Assertions.assertThat(body.getUsername()).isEqualTo(userSignUp.username());
+        Assertions.assertThat(body.isEmailVerified()).isFalse();
+        Assertions.assertThat(body.isEnabled()).isTrue();
+
+        Assertions.assertThat(body.getCredentials())
+                .extracting(
+                        UserRepresentation.CredentialRepresentation::getType,
+                        UserRepresentation.CredentialRepresentation::getValue,
+                        UserRepresentation.CredentialRepresentation::isTemporary
+                ).containsOnly(
+                        Tuple.tuple("password",
+                                userSignUp.password(),
+                                false)
+                );
+
+    }
+
+    @Test
+    public void shouldReturnResponseWithExceptionWhenRestTemplateDoThrowOnCreate() {
+        when(restTemplate.postForEntity(eq("localhost:8080/admin/realms/realm/users"), any(), eq(Void.class))).thenThrow(new HttpClientErrorException(HttpStatus.FORBIDDEN, "Forbidden"));
+        final ResponseEntity<?> response = authenticationKeycloakManager.create(UserFixture.createUserSignUp());
+        Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        Assertions.assertThat(response.getBody()).isEqualTo("403 Forbidden");
+    }
 }

@@ -2,6 +2,7 @@ package com.auth.service.infra.resource;
 
 import com.auth.service.application.AuthenticationManager;
 import com.auth.service.domain.UserLogin;
+import com.auth.service.domain.UserSignUp;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,11 @@ public class AuthResource {
     @PostMapping("/refresh")
     public ResponseEntity<?> login(@RequestParam("refresh_token") String refreshToken) {
         return authenticationManager.refresh(refreshToken);
+    }
+
+    @PostMapping
+    public ResponseEntity<?> create(@RequestBody @Valid UserSignUp userSignUp) {
+        return authenticationManager.create(userSignUp);
     }
 
 }

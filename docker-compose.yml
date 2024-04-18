@@ -46,6 +46,7 @@ services:
     container_name: keycloak_gateway
     volumes: 
       - ./auth:/app
+    profiles: ['gateway']
     environment:
       EUREKA_ADDRESS: http://eureka:8761
       KEYCLOAK_ADDRESS: http://keycloak:8080
