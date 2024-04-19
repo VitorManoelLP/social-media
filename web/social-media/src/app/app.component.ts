@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { RouterModule, RouterOutlet } from '@angular/router';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { KeycloakAngularModule, KeycloakBearerInterceptor } from 'keycloak-angular';
 import { CommonModule } from '@angular/common';
 import { KeycloakProfile } from 'keycloak-js';
-import Profile from './auth/shared/profile';
+import Profile from './auth/shared/context/profile';
 
 @Component({
   selector: 'app-root',
@@ -14,13 +14,6 @@ import Profile from './auth/shared/profile';
     CommonModule,
     RouterModule,
     KeycloakAngularModule
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: KeycloakBearerInterceptor,
-      multi: true
-    }
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'

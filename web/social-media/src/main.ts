@@ -1,8 +1,8 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
-import { Keycloak } from './app/auth/shared/keycloak.wrapper.service';
-import Profile from './app/auth/shared/profile';
+import { Keycloak } from './app/auth/shared/service/keycloak.wrapper.service';
+import Profile from './app/auth/shared/context/profile';
 
 const keycloak = new Keycloak();
 

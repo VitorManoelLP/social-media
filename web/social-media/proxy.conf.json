@@ -1,0 +1,10 @@
+{
+  "/social-media/api/**": {
+    "target": "http://localhost:9000",
+    "secure": false,
+    "ws": true,
+    "headers": {
+      "Connection": "Keep-Alive"
+    }
+  }
+}

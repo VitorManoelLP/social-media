@@ -1,4 +1,4 @@
-import getConfig from "../auth/shared/auth.configuration.prod";
+import getConfig from "../auth/shared/configuration/auth.configuration.prod";
 
 export const environment = {
   production: true,

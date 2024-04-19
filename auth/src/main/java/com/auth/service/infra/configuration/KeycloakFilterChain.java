@@ -30,15 +30,8 @@ public class KeycloakFilterChain extends GenericFilterBean {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-
         final ClientContextHolder instance = ClientContextHolder.getInstance();
-
-        if (instance.missingClient()) {
-            defineClient(instance);
-        } else {
-            refreshToken(instance);
-        }
-
+        defineClient(instance);
         filterChain.doFilter(servletRequest, servletResponse);
     }
 
@@ -62,30 +55,6 @@ public class KeycloakFilterChain extends GenericFilterBean {
 
         } catch (HttpClientErrorException ex) {
             throw new InvalidClientAccessException(ex.getStatusCode(), ex.getMessage());
-        }
-    }
-
-    private void refreshToken(ClientContextHolder instance) {
-
-        final JwtToken jwtToken = instance.getClient().jwt();
-
-        if(jwtToken.isExpired()) {
-
-            final HttpEntity<MultiValueMap<String, String>> httpEntity = KeycloakHeadersBuilder.builder(adminId, adminSecret)
-                    .withGrantType("refresh_token")
-                    .withRefreshToken(jwtToken.getToken())
-                    .build();
-
-            final ResponseEntity<String> responseToken = restTemplate.postForEntity(
-                    keycloakProperties.getValidateTokenEndpoint("master"),
-                    httpEntity,
-                    String.class
-            );
-
-            if (responseToken.getStatusCode().is2xxSuccessful()) {
-                instance.setClient(new KeycloakClient(JwtToken.from(responseToken), keycloakProperties));
-            }
-
         }
     }
 

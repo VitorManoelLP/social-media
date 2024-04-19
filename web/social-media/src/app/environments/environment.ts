@@ -1,4 +1,4 @@
-import getConfig from "../auth/shared/auth.configuration.dev";
+import getConfig from "../auth/shared/configuration/auth.configuration.dev";
 
 export const environment = {
   production: false,

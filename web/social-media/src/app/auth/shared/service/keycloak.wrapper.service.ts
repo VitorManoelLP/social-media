@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { KeycloakService } from "keycloak-angular";
-import { environment } from "../../environments/environment";
+import { environment } from "../../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +17,9 @@ export class Keycloak extends KeycloakService {
       initOptions: {
         onLoad: 'login-required',
         checkLoginIframe: false,
-      }
+      },
+      enableBearerInterceptor: true,
+      bearerPrefix: 'Bearer'
     });
   }
 

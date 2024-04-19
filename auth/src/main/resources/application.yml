@@ -1,29 +1,17 @@
 spring:
-  flyway:
-    schemas: auth
   application:
     name: keycloak-gateway
-  datasource:
-    url: jdbc:postgresql://${POSTGRES_ADDRESS}/postgres
-    username: postgres
-    password: postgres
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: none
-      show-sql: true
-      default_schema: auth
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    properties:
-      hibernate:
-        format_sql: true
-        use_sql_comments: true
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
-          lowerCaseServiceId: true
+      default-filters:
+        - TokenRelay
+      routes:
+        - id: social-media
+          uri: http://127.0.0.1:3000
+          predicates:
+            - Path=/social-media/**
+          filters:
+            - RemoveRequestHeader=Cookie
   security:
     oauth2:
       client:

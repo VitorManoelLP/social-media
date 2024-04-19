@@ -1,17 +1,35 @@
-<div class="container text-center">
+<div class="container-lg text-center mt-5">
   <div class="row">
-    <div class="col">
-      <div class="row">
-        <div class="col-md-2">
-          teste
-        </div>
+    <div class="col-md-3">
+      <div class="list-group list-group-flush">
+
+        <button type="button" class="list-group-item list-group-item-action"
+          [ngClass]="{ 'active bg-dark': optionsService.options['me'].active}" aria-current="true"
+          (click)="optionsService.onSwitchOption('me')">
+          <span class="fa-stack fa-2xs fa-1x">
+            <i class="fa fa-circle-thin fa-stack-2x" aria-hidden="true"></i>
+            <i class="fa fa-user" aria-hidden="true"></i>
+          </span>
+          {{ profile.firstName }}
+        </button>
+
+        <button type="button" class="list-group-item list-group-item-action"
+          [ngClass]="{ 'active bg-dark': optionsService.options['friends'].active}" aria-current="true"
+          (click)="optionsService.onSwitchOption('friends')">
+          <span class="fa-stack fa-2xs fa-1x">
+            <i class="fa fa-circle-thin fa-stack-2x" aria-hidden="true"></i>
+            <i class="fa fa-users" aria-hidden="true"></i>
+          </span>
+          Friends
+        </button>
+
       </div>
     </div>
-    <div class="col">
-      Column
-    </div>
-    <div class="col">
-      Column
+    <div class="col-9 shadow p-3 mb-5 bg-body-tertiary rounded">
+      <div class="ad-banner-example">
+        <ng-container *ngComponentOutlet="
+          optionComponent.component;
+          inputs: optionComponent.inputs;" />
+      </div>
     </div>
   </div>
-</div>
