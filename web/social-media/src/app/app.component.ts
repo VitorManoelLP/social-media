@@ -1,14 +1,19 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { KeycloakWrapperService } from './auth/shared/keycloak.wrapper.service';
+import { RouterModule, RouterOutlet } from '@angular/router';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { KeycloakBearerInterceptor } from 'keycloak-angular';
+import { KeycloakAngularModule, KeycloakBearerInterceptor } from 'keycloak-angular';
+import { CommonModule } from '@angular/common';
+import { KeycloakProfile } from 'keycloak-js';
+import Profile from './auth/shared/profile';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
-    RouterOutlet
+    RouterOutlet,
+    CommonModule,
+    RouterModule,
+    KeycloakAngularModule
   ],
   providers: [
     {
@@ -22,8 +27,6 @@ import { KeycloakBearerInterceptor } from 'keycloak-angular';
 })
 export class AppComponent {
 
-  constructor(private keycloakService: KeycloakWrapperService) {
-    keycloakService.initKeycloak();
-  }
+  user: KeycloakProfile = Profile.getInstance().user;
 
 }

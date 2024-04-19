@@ -5,18 +5,18 @@ import { environment } from "../../environments/environment";
 @Injectable({
   providedIn: 'root'
 })
-export class KeycloakWrapperService extends KeycloakService {
+export class Keycloak extends KeycloakService {
 
   constructor() {
     super();
   }
 
-  public initKeycloak(): void {
-    this.init({
+  public initKeycloak(): Promise<boolean> {
+    return this.init({
       config: environment.authConfiguration,
       initOptions: {
         onLoad: 'login-required',
-        checkLoginIframe: false
+        checkLoginIframe: false,
       }
     });
   }
