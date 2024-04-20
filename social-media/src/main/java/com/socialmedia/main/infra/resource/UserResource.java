@@ -15,7 +15,7 @@ public class UserResource {
 
 
     @GetMapping
-    public ResponseEntity<Page<User>> findAllUsers(@RequestParam String search, Pageable pageable) {
+    public ResponseEntity<Page<User>> findAllUsers(@RequestParam(required = false, defaultValue = "") String search, Pageable pageable) {
         return ResponseEntity.ok().build();
     }
 

@@ -23,7 +23,6 @@ keycloak-address: ${KEYCLOAK_ADDRESS}
 
 eureka:
   instance:
-    hostname: localhost
     preferIpAddress: false
   client:
     serviceUrl:

@@ -3,15 +3,11 @@ spring:
     name: keycloak-gateway
   cloud:
     gateway:
-      default-filters:
-        - TokenRelay
       routes:
         - id: social-media
-          uri: http://127.0.0.1:3000
+          uri: lb://SOCIAL-MEDIA
           predicates:
             - Path=/social-media/**
-          filters:
-            - RemoveRequestHeader=Cookie
   security:
     oauth2:
       client:
