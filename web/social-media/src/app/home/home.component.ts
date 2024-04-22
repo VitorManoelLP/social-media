@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { KeycloakProfile } from 'keycloak-js';
 import Profile from '../auth/shared/context/profile';
-import { OptionService } from './options/options.service';
+import { UserService } from '../shared/user.service';
+import { PageParameter } from '../shared/http/http.param';
 
 @Component({
   selector: 'app-home',
@@ -9,12 +10,33 @@ import { OptionService } from './options/options.service';
 })
 export class HomeComponent {
 
+  public options: { [key: string]: any } = {
+    me: {
+      active: true
+    },
+    friends: {
+      active: false
+    }
+  };
+
+  optionSelected: { [key: string]: any } = this.options['me'];
+
   readonly profile: KeycloakProfile = Profile.getInstance().user;
 
-  constructor(public optionsService: OptionService) { }
+  constructor(public userService: UserService) { }
 
-  get optionComponent() {
-    return this.optionsService.getCurrentOption()
+  onSwitchOption(option: string) {
+    Object.keys(this.options).forEach(option => this.options[option].active = false);
+    this.options[option].active = true;
+    this.optionSelected = this.options[option];
+  }
+
+  callGetUser() {
+    return (search: string, page: PageParameter) => this.userService.getUsers(search, page);
+  }
+
+  buildSearch(value: string) {
+    return `firstName=="${value}*",username=="${value}*"`;
   }
 
 }

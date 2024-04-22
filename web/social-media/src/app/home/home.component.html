@@ -4,8 +4,7 @@
       <div class="list-group list-group-flush">
 
         <button type="button" class="list-group-item list-group-item-action"
-          [ngClass]="{ 'active bg-dark': optionsService.options['me'].active}" aria-current="true"
-          (click)="optionsService.onSwitchOption('me')">
+          [ngClass]="{ 'active bg-dark': options['me'].active}" aria-current="true" (click)="onSwitchOption('me')">
           <span class="fa-stack fa-2xs fa-1x">
             <i class="fa fa-circle-thin fa-stack-2x" aria-hidden="true"></i>
             <i class="fa fa-user" aria-hidden="true"></i>
@@ -14,8 +13,8 @@
         </button>
 
         <button type="button" class="list-group-item list-group-item-action"
-          [ngClass]="{ 'active bg-dark': optionsService.options['friends'].active}" aria-current="true"
-          (click)="optionsService.onSwitchOption('friends')">
+          [ngClass]="{ 'active bg-dark': options['friends'].active}" aria-current="true"
+          (click)="onSwitchOption('friends')">
           <span class="fa-stack fa-2xs fa-1x">
             <i class="fa fa-circle-thin fa-stack-2x" aria-hidden="true"></i>
             <i class="fa fa-users" aria-hidden="true"></i>
@@ -27,9 +26,19 @@
     </div>
     <div class="col-9 shadow p-3 mb-5 bg-body-tertiary rounded">
       <div class="ad-banner-example">
-        <ng-container *ngComponentOutlet="
-          optionComponent.component;
-          inputs: optionComponent.inputs;" />
+        <div [ngSwitch]="optionSelected">
+
+          <div *ngSwitchDefault>
+          </div>
+
+          <div *ngSwitchCase="options['friends']">
+            <app-table [call]="this.callGetUser()" [buildSearch]="buildSearch">
+              <column field="name" caption="Name" />
+              <column field="nickname" caption="Nickname" />
+            </app-table>
+          </div>
+
+        </div>
       </div>
     </div>
   </div>

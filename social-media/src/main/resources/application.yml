@@ -3,11 +3,6 @@ spring:
     schemas: social_media
   application:
     name: social-media
-  datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: postgres
-    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: none
@@ -17,16 +12,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        use_sql_comments: tru
-
-keycloak-address: ${KEYCLOAK_ADDRESS}
-
-eureka:
-  instance:
-    preferIpAddress: false
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_ADDRESS}/eureka/
+        use_sql_comments: true
 
 server:
   port: 3000

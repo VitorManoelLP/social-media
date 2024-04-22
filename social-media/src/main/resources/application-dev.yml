@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+keycloak-address: ${KEYCLOAK_ADDRESS}
+
+eureka:
+  instance:
+    preferIpAddress: false
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_ADDRESS}/eureka/

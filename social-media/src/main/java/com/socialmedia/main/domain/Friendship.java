@@ -13,7 +13,7 @@ import java.util.UUID;
 @Getter
 @ToString(of = "id")
 @EqualsAndHashCode(of = "id")
-@Table(name = "friendship")
+@Table(name = "friendship", schema = "social_media")
 public class Friendship {
 
     @Id

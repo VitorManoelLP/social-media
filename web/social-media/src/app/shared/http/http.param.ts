@@ -23,14 +23,14 @@ export class HttpParam {
     }
 
     if (this.search) {
-      requestParam = requestParam.includes('?') ? '&' + this.setSearch() : this.setSearch();
+      requestParam = requestParam += requestParam.includes('?') ? '&' + this.setSearch() : '?' + this.setSearch();
     }
 
     return requestParam;
   }
 
   private setSearch() {
-    return this.search ? `?search=${this.search}` : '';
+    return this.search ? `search=${this.search}` : '';
   }
 
   private setPage() {
@@ -44,26 +44,57 @@ export class HttpParam {
 
 }
 
-export interface PageParameter {
-  page: number;
-  size: number;
+export class PageParameter {
+
+  _page: number;
+  _size: number;
+
+  constructor(page: number, size: number) {
+    this._page = page;
+    this._size = size;
+  }
+
+  get page() {
+    return this._page;
+  }
+
+  get size() {
+    return this._size;
+  }
+
+  withSize(size: number) {
+    this._size = size;
+    return this;
+  }
+
+  withPage(page: number) {
+    this._page = page;
+    return this;
+  }
+
+  static empty(sizeDefault: number): PageParameter {
+    return new PageParameter(0, sizeDefault);
+  }
+
 }
 
 export class Pageable<T> {
   content: T[];
-  pageNumber: number;
+  number: number;
   pageSize: number;
   totalElements: number;
+  totalPages: number;
 
-  constructor(content: T[], pageNumber: number, pageSize: number, totalElements: number) {
+  constructor(content: T[], number: number, pageSize: number, totalElements: number, totalPages: number) {
     this.content = content;
-    this.pageNumber = pageNumber;
+    this.number = number;
     this.pageSize = pageSize;
     this.totalElements = totalElements;
+    this.totalPages = totalPages;
   }
 
   static ofEmpty() {
-    return new Pageable([], 0, 10, 0);
+    return new Pageable([], 0, 10, 0, 0);
   }
 
 }

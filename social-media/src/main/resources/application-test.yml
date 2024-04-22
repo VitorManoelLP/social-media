@@ -1,0 +1,8 @@
+spring:
+  flyway:
+    locations: classpath:migration-test, classpath:db/migration
+  cloud:
+    config:
+      enabled: false
+    discovery:
+      enabled: false

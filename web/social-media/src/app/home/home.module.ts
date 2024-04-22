@@ -3,9 +3,8 @@ import { CommonModule, NgComponentOutlet } from '@angular/common';
 import { HomeComponent } from './home.component';
 import { Route, RouterModule } from '@angular/router';
 import { AuthGuard } from '../auth/keycloak-auth-guard';
-import { OptionService } from './options/options.service';
 import { UserService } from '../shared/user.service';
-import { TableComponent } from '../shared/components/table/table.component';
+import { TableCustomModule } from '../shared/components/table/table.module';
 
 const route: Route = {
   path: '',
@@ -18,11 +17,10 @@ const route: Route = {
   imports: [
     CommonModule,
     NgComponentOutlet,
-    TableComponent,
+    TableCustomModule,
     RouterModule.forChild([route])
   ],
   providers: [
-    OptionService,
     UserService
   ]
 })

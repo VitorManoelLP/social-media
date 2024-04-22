@@ -6,6 +6,7 @@ import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@a
 import { KeycloakService } from 'keycloak-angular';
 import keycloak from '../main';
 import { KeycloakInterceptor } from './auth/shared/interceptor/keycloak.interceptor';
+import { provideAnimations } from '@angular/platform-browser/animations'
 
 const keycloakInterceptorProvider: Provider = {
   provide: HTTP_INTERCEPTORS,
@@ -21,6 +22,7 @@ export const appConfig: ApplicationConfig = {
       useExisting: keycloak
     },
     provideHttpClient(withInterceptorsFromDi()),
+    provideAnimations(),
     keycloakInterceptorProvider
   ]
 };
