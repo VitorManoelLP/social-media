@@ -3,6 +3,7 @@ import { Pageable } from "../../http/http.param";
 import { ColumnComponent } from "./column.component";
 import { interval, of, tap } from "rxjs";
 import { Paginator } from "./model/paginator.model";
+import { TableButtonComponent } from "./table-button.component";
 
 @Component({
   selector: 'app-table',
@@ -16,9 +17,13 @@ export class TableComponent implements OnInit {
   @Input({ required: true })
   public buildSearch!: Function;
 
+  @Input()
+  public handlingFunction: Function = () => { };
+
   public loading: boolean = false;
 
   public columns: ColumnComponent[] = [];
+  public buttons: TableButtonComponent[] = [];
 
   public page: Pageable<any> = Pageable.ofEmpty();
 
@@ -62,6 +67,10 @@ export class TableComponent implements OnInit {
     this.columns.push(column);
   }
 
+  public addButtons(button: TableButtonComponent) {
+    this.buttons.push(button);
+  }
+
   public changeNumberPeerPage(event: Event) {
     const value = (event.target as HTMLSelectElement).value;
     this.paginator.page
@@ -73,7 +82,12 @@ export class TableComponent implements OnInit {
   search() {
     this.loading = true; this.paginator.page
     this.callSearch(this._search, this.paginator.page)
-      .pipe(tap(() => this.loading = false))
+      .pipe(tap((page: Pageable<any>) => {
+        this.loading = false;
+        if (page.content.length) {
+          page.content.forEach(content => this.handlingFunction(content));
+        }
+      }))
       .subscribe((contentPage: Pageable<any>) => this.onChangePage(contentPage));
   }
 

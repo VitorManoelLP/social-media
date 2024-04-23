@@ -5,6 +5,7 @@ import { KeycloakAngularModule, KeycloakBearerInterceptor } from 'keycloak-angul
 import { CommonModule } from '@angular/common';
 import { KeycloakProfile } from 'keycloak-js';
 import Profile from './auth/shared/context/profile';
+import keycloak from '../main';
 
 @Component({
   selector: 'app-root',
@@ -21,5 +22,10 @@ import Profile from './auth/shared/context/profile';
 export class AppComponent {
 
   user: KeycloakProfile = Profile.getInstance().user;
+
+  async logout() {
+    keycloak.clearToken();
+    keycloak.logout(window.location.origin);
+  }
 
 }

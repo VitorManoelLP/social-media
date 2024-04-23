@@ -9,7 +9,7 @@
             <i class="fa fa-circle-thin fa-stack-2x" aria-hidden="true"></i>
             <i class="fa fa-user" aria-hidden="true"></i>
           </span>
-          {{ profile.firstName }}
+          {{ profile.username }}
         </button>
 
         <button type="button" class="list-group-item list-group-item-action"
@@ -32,10 +32,32 @@
           </div>
 
           <div *ngSwitchCase="options['friends']">
-            <app-table [call]="this.callGetUser()" [buildSearch]="buildSearch">
-              <column field="name" caption="Name" />
-              <column field="nickname" caption="Nickname" />
-            </app-table>
+
+            <sui-tabset>
+              <div class="ui top attached tabular menu">
+                <a class="item" suiTabHeader="1">
+                  Friends
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    99+
+                    <span class="visually-hidden">Requests pending</span>
+                  </span>
+                </a>
+                <a class="item" suiTabHeader="2">Add new friends</a>
+              </div>
+              <div class="ui bottom attached segment" suiTabContent="1">First tab!</div>
+              <div class="ui bottom attached segment" suiTabContent="2">
+                <app-table [call]="this.callGetUser()" [buildSearch]="buildSearch"
+                  [handlingFunction]="defineAlreadySentRequest">
+                  <column field="name" caption="Name" />
+                  <column field="nickname" caption="Nickname" />
+                  <table-button [description]="'Add'" [icon]="'fa fa-plus'" (onClick)="onClickAdd($event)"
+                    [show]="shouldHiddenRequest" />
+                  <table-button [description]="'Accept'" [icon]="'fa fa-check'" (onClick)="onClickAdd($event)"
+                    [show]="shouldShowAcceptAction" />
+                </app-table>
+              </div>
+            </sui-tabset>
+
           </div>
 
         </div>

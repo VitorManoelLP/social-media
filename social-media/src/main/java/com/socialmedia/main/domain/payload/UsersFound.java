@@ -1,6 +1,6 @@
 package com.socialmedia.main.domain.payload;
 
-import com.socialmedia.main.domain.User;
+import java.util.UUID;
 
-public record UsersFound(String name, String nickname) {
+public record UsersFound(UUID id, String name, String nickname, boolean alreadyRequested, boolean hasRequest) {
 }

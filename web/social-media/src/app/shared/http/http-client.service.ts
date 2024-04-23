@@ -16,5 +16,8 @@ export class HttpClientWrapper {
     return this.httpClient.get<T>(`${location}${param.buildRequest()}`);
   }
 
+  public post<T>(param: HttpParam, location: string = this.location): Observable<T> {
+    return this.httpClient.post<T>(`${location}${param.buildRequest()}`, param.body);
+  }
 
 }

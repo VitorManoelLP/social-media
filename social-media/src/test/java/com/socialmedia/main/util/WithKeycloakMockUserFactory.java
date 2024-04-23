@@ -26,7 +26,7 @@ public class WithKeycloakMockUserFactory implements WithSecurityContextFactory<W
                         .header("alg", "HS256")
                         .claim("sub", mockUser.principal())
                         .build(),
-                List.of(new SimpleGrantedAuthority("ROLE"))
+                List.of(new SimpleGrantedAuthority("ADMIN"))
         );
 
         emptyContext.setAuthentication(jwtAuthenticationToken);

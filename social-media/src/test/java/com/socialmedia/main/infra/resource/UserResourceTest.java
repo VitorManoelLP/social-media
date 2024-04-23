@@ -3,7 +3,11 @@ package com.socialmedia.main.infra.resource;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.socialmedia.main.context.TestContainerExtension;
+import com.socialmedia.main.domain.Friendship;
+import com.socialmedia.main.domain.enums.FriendshipStatus;
 import com.socialmedia.main.domain.payload.UsersFound;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -20,6 +24,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
@@ -101,6 +106,25 @@ public class UserResourceTest extends TestContainerExtension {
                 .hasSize(1)
                 .extracting(content -> content.get("name"))
                 .containsExactlyInAnyOrder("Osvaldo");
+    }
+
+    @Test
+    public void shouldSendFriendRequest() throws Exception {
+
+        mockMvc.perform(post("/api/users/request/84a43a24-c802-4aae-9e67-2b7f1ce35449"))
+                .andExpect(status().isOk());
+
+        final List<Friendship> friendShipRequest = getEm().createQuery("SELECT f FROM Friendship f WHERE f.friend.id = '84a43a24-c802-4aae-9e67-2b7f1ce35449'", Friendship.class)
+                .getResultList();
+
+        Assertions.assertThat(friendShipRequest)
+                .hasSize(1)
+                .extracting(friendship -> friendship.getRequester().getId(), Friendship::getStatus)
+                .containsExactly(Tuple.tuple(
+                       "c3dfaaae-e871-43c9-9d17-056d23e5e8c2",
+                        FriendshipStatus.PENDING
+                ));
+
     }
 
 }

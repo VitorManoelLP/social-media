@@ -5,6 +5,7 @@ import { Route, RouterModule } from '@angular/router';
 import { AuthGuard } from '../auth/keycloak-auth-guard';
 import { UserService } from '../shared/user.service';
 import { TableCustomModule } from '../shared/components/table/table.module';
+import { SuiModule, SuiTabsModule } from '@angular-ex/semantic-ui';
 
 const route: Route = {
   path: '',
@@ -17,6 +18,8 @@ const route: Route = {
   imports: [
     CommonModule,
     NgComponentOutlet,
+    SuiModule,
+    SuiTabsModule,
     TableCustomModule,
     RouterModule.forChild([route])
   ],

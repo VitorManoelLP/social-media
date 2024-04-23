@@ -3,6 +3,8 @@ import { KeycloakProfile } from 'keycloak-js';
 import Profile from '../auth/shared/context/profile';
 import { UserService } from '../shared/user.service';
 import { PageParameter } from '../shared/http/http.param';
+import UserFound from '../model/user-found.model';
+import User from '../model/user.model';
 
 @Component({
   selector: 'app-home',
@@ -37,6 +39,27 @@ export class HomeComponent {
 
   buildSearch(value: string) {
     return `firstName=="${value}*",username=="${value}*"`;
+  }
+
+  onClickAdd(value: UserFound) {
+    if (value.alreadyRequested) return;
+    value['icon'] = 'fa fa-check';
+    value.alreadyRequested = true;
+    this.userService.sendRequest(value['id']).subscribe();
+  }
+
+  defineAlreadySentRequest(value: UserFound) {
+    if (value.alreadyRequested) {
+      value['icon'] = 'fa fa-check';
+    }
+  }
+
+  shouldHiddenRequest(value: UserFound) {
+    return !value.hasRequest;
+  }
+
+  shouldShowAcceptAction(value: UserFound) {
+    return value.hasRequest;
   }
 
 }

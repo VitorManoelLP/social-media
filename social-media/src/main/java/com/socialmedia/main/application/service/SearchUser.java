@@ -6,8 +6,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class SearchUser {
 
@@ -15,7 +19,13 @@ public class SearchUser {
 
     public Page<UsersFound> search(String search, Pageable pageable) {
         return userRepository.findAll(search, pageable)
-                .map(user -> new UsersFound(user.getFirstName(), user.getUsername()));
+                .map(user -> new UsersFound(
+                        UUID.fromString(user.getId()),
+                        user.getFirstName(),
+                        user.getUsername(),
+                        user.alreadyRequested(),
+                        user.hasRequest())
+                );
     }
 
 }

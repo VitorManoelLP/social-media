@@ -1,5 +1,6 @@
 package com.socialmedia.main.context;
 
+import com.socialmedia.main.configuration.SecurityConfiguration;
 import com.socialmedia.main.util.WithKeycloakMockUser;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.GenericContainer;
@@ -18,12 +20,12 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.util.Map;
 
-@Getter
 @SpringBootTest
 @Testcontainers
 @Transactional
 @Rollback
 @WithKeycloakMockUser
+@Import(SecurityConfiguration.class)
 @ActiveProfiles("test")
 public class TestContainerExtension {
 
@@ -45,6 +47,10 @@ public class TestContainerExtension {
 
     @ServiceConnection(name = "redis")
     public static GenericContainer<?> redisContainer = new GenericContainer<>(DockerImageName.parse("redis:latest")).withExposedPorts(6379);
+
+    public EntityManager getEm() {
+        return em;
+    }
 
     @BeforeAll
     public static void beforeAll() {

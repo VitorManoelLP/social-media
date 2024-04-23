@@ -9,12 +9,25 @@
       <th *ngFor="let column of columns" scope="col">
         {{ column.caption }}
       </th>
+      <th *ngIf="buttons.length"></th>
     </tr>
   </thead>
   <tbody>
     <tr *ngFor="let object of page.content">
       <td *ngFor="let column of columns">
         {{ object[column.field] }}
+      </td>
+      <td *ngFor="let button of buttons">
+
+        <button type="button" class="btn btn-success btn-sm" style="background-color: #22c55e;"
+          (click)="button.click(object)" *ngIf="button.show(object)">
+
+          <i *ngIf="object['icon'] || button.icon?.length" [class]="object['icon'] || button.icon"></i>
+
+          <span *ngIf="!object['icon']">{{ button.description }}</span>
+
+        </button>
+
       </td>
     </tr>
   </tbody>
@@ -23,6 +36,7 @@
   <div class="col-sm-7">
     <nav aria-label="Page navigation example">
       <ul class="pagination justify-content-end">
+
         <li class="page-item">
           <a class="page-link" (click)="onPrevious()">Previous</a>
         </li>
@@ -35,6 +49,7 @@
         <li class="page-item">
           <a class="page-link" (click)="onNext()">Next</a>
         </li>
+
       </ul>
     </nav>
   </div>

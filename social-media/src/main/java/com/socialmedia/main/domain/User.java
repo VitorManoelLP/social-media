@@ -1,5 +1,6 @@
 package com.socialmedia.main.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Sets;
 import com.socialmedia.main.domain.enums.FriendshipStatus;
 import jakarta.persistence.*;
@@ -9,6 +10,7 @@ import lombok.ToString;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.validator.constraints.UUID;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -42,6 +44,22 @@ public class User {
 
     @OneToMany(mappedBy = "requester")
     private final Set<Friendship> friendRequests = new HashSet<>();
+
+    public boolean alreadyRequested() {
+        return friendsAccepted.stream().anyMatch(friend -> requestedByLoggedUser(friend) && friend.getStatus().equals(FriendshipStatus.PENDING));
+    }
+
+    public boolean hasRequest() {
+        return friendRequests.stream().anyMatch(friend -> hasRequest(friend) && friend.getStatus().equals(FriendshipStatus.PENDING));
+    }
+
+    private boolean requestedByLoggedUser(Friendship friend) {
+        return friend.getRequester().getId().equals(SecurityContextHolder.getContext().getAuthentication().getName());
+    }
+
+    private boolean hasRequest(Friendship friend) {
+        return friend.getFriend().getId().equals(SecurityContextHolder.getContext().getAuthentication().getName());
+    }
 
     public Set<Friendship> getFriends() {
         return Sets.union(

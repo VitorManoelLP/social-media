@@ -3,15 +3,15 @@ package com.socialmedia.main.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.socialmedia.main.domain.enums.FriendshipStatus;
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.UUID;
 
 @Entity
 @Getter
 @ToString(of = "id")
+@AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(of = "id")
 @Table(name = "friendship", schema = "social_media")
 public class Friendship {
